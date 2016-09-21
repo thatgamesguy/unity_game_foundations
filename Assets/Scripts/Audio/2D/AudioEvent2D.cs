@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Raised when audio clip should be played. Picked up by AudioPlayer2D.
+/// </summary>
 public class AudioEvent2D : GameEvent, IAudioEvent2D
 {
     private AudioClip audioClip;

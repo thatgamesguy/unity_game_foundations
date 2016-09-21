@@ -1,16 +1,32 @@
 using UnityEngine;
-using System.Collections;
 
-
+/// <summary>
+/// Listens to audio events. Adds audio events to circular array with MaxPending
+/// and plays associated audio clip each time step.
+/// </summary>
 [RequireComponent(typeof(AudioSource))]
 public class AudioPlayer2D : MonoBehaviour
 {
+    /// <summary>
+    /// The maximum number of queued clips. Oldest clips are overwritten when max reached.
+    /// </summary>
     public int MaxPending = 30;
 
     private AudioSource source;
+
+    /// <summary>
+    /// Queue of events to play.
+    /// </summary>
     private IAudioEvent2D[] pending;
 
+    /// <summary>
+    /// Reference to current head of cicular array (index to pop new audio event).
+    /// </summary>
     private int head;
+
+    /// <summary>
+    /// Index to add new events.
+    /// </summary>
     private int tail;
 
     void Awake()
@@ -33,6 +49,9 @@ public class AudioPlayer2D : MonoBehaviour
         Events.instance.RemoveListener<AudioEvent2D>(OnAudio);
     }
 
+    /// <summary>
+    /// Plays pending clips.
+    /// </summary>
     void Update()
     {
         if (head == tail)
@@ -47,6 +66,8 @@ public class AudioPlayer2D : MonoBehaviour
 
     void OnAudio(IAudioEvent2D e)
     {
+        // Do not add duplicate events. Prevents situation where the same
+        // audio clips are played in parallel increasing the effects volume.
         for (int i = head; i != tail; i = (i + 1) % MaxPending)
         {
             if (pending[i].Audio.name.Equals(e.Audio.name))
