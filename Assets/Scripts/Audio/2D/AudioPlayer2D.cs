@@ -1,62 +1,63 @@
 using UnityEngine;
 using System.Collections;
 
-namespace GameFoundations
+
+[RequireComponent(typeof(AudioSource))]
+public class AudioPlayer2D : MonoBehaviour
 {
-	[RequireComponent (typeof(AudioSource))]
-	public class AudioPlayer2D : MonoBehaviour
-	{
-		public int MaxPending = 30;
+    public int MaxPending = 30;
 
-		private AudioSource source;
-		private IAudioEvent2D[] pending;
+    private AudioSource source;
+    private IAudioEvent2D[] pending;
 
-		private int head;
-		private int tail;
+    private int head;
+    private int tail;
 
-		void Awake ()
-		{
-			source = GetComponent<AudioSource> ();
-			source.spatialBlend = 0f;
-		}
+    void Awake()
+    {
+        source = GetComponent<AudioSource>();
+        source.spatialBlend = 0f;
+    }
 
-		void OnEnable ()
-		{
-			head = tail = 0;
+    void OnEnable()
+    {
+        head = tail = 0;
 
-			pending = new IAudioEvent2D [MaxPending];
-			
-			Events.instance.AddListener<AudioEvent2D> (OnAudio);
-		}
-		
-		void OnDisable ()
-		{
-			Events.instance.RemoveListener<AudioEvent2D> (OnAudio);
-		}
+        pending = new IAudioEvent2D[MaxPending];
 
-		void Update ()
-		{
-			if (head == tail)
-				return;
+        Events.instance.AddListener<AudioEvent2D>(OnAudio);
+    }
 
-			Debug.Log ("Playing AudioClip: " + pending [head].Audio.name);
-			
-			source.PlayOneShot (pending [head].Audio);
+    void OnDisable()
+    {
+        Events.instance.RemoveListener<AudioEvent2D>(OnAudio);
+    }
 
-			head = (head + 1) % MaxPending;
-		}
-	
-		void OnAudio (IAudioEvent2D e)
-		{
-			for (int i = head; i != tail; i = (i+1) % MaxPending) {
-				if (pending [i].Audio.name.Equals (e.Audio.name)) {
-					return;
-				}
-			}
+    void Update()
+    {
+        if (head == tail)
+            return;
 
-			pending [tail] = e;
-			tail = (tail + 1) % MaxPending;
-		}
+        Debug.Log("Playing AudioClip: " + pending[head].Audio.name);
 
-	}
+        source.PlayOneShot(pending[head].Audio);
+
+        head = (head + 1) % MaxPending;
+    }
+
+    void OnAudio(IAudioEvent2D e)
+    {
+        for (int i = head; i != tail; i = (i + 1) % MaxPending)
+        {
+            if (pending[i].Audio.name.Equals(e.Audio.name))
+            {
+                return;
+            }
+        }
+
+        pending[tail] = e;
+        tail = (tail + 1) % MaxPending;
+    }
+
 }
+
