@@ -54,11 +54,9 @@ public class ShapeController : MonoBehaviour
 
     protected void Spawn()
     {
-        GameObject cube = null;
-
         try
         {
-            cube = ObjectPool.instance.GetObject(this.name);
+            GameObject cube = ObjectPool.instance.GetObject(this.name);
             cube.transform.position = new Vector3(transform.position.x + Random.Range(-1f, 1f),
                          transform.position.y,
                          transform.position.z + Random.Range(-1f, 1f));
@@ -70,6 +68,7 @@ public class ShapeController : MonoBehaviour
         }
         catch (PrefabNotFoundException e)
         {
+            // Object not contained in pool.
             Debug.Log(e.Message);
         }
     }
